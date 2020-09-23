@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Global;
 
 public class Grid
 {
@@ -15,6 +16,23 @@ public class Grid
 			op = o;
 			value = v;
 		}
+
+		public int Apply(int start)
+		{
+			switch (op)
+			{
+				case Ops.Divide:
+					return start / value;
+				case Ops.Minus:
+					return start - value;
+				case Ops.Plus:
+					return start + value;
+				case Ops.Times:
+					return start * value;
+				default:
+					return value;
+			}
+		}
 	}
 
 	public struct XY
@@ -25,6 +43,11 @@ public class Grid
 		{
 			x = _x;
 			y = _y;
+		}
+
+		public override string ToString()
+		{
+			return "x: " + x + " y: " + y;
 		}
 	}
 	GridEle[][] grid;
@@ -86,15 +109,106 @@ public class Grid
 			tried.Add(toTry);
 			result.Push(toTry);
 		} while (!finished);
-
-		return result.ToList<XY>();
+		var list = result.ToList<XY>();
+		list.Reverse();
+		return list;
 	}
 
 	public void FillPath(int start, int end, List<XY> path, Random rand)
 	{
 		Set(0, 0, new GridEle(Global.Ops.Goal, start));
-		Set(maxX, maxY, new GridEle(Global.Ops.Goal, end));
-
+		Set(maxX-1, maxY-1, new GridEle(Global.Ops.Goal, end));
+		int i = 0;
+		int value = start;
+		foreach(var xy in path)
+		{
+			GD.Print("xy on path ", xy, " index ", i);
+			i++;
+			GD.Print("ele is ", At(xy).op, " ", At(xy).value);
+			GD.Print("current value is ", value);
+			if(At(xy).op == Global.Ops.Goal)
+			{
+				GD.Print("at goal");
+				continue;
+			}
+			else if(i == path.Count - 1)
+			{
+				GD.Print("at end but one");
+				int diff = end-value;
+				if(diff >= 0)
+				{
+					Set(xy, new GridEle(Ops.Plus, diff));
+				}
+				else
+				{
+					Set(xy, new GridEle(Ops.Minus, Math.Abs(diff)));
+				}
+			}
+			else
+			{
+				Ops op = Ops.None;
+				int randomOp = rand.Next(4);
+				switch(randomOp)
+				{
+					case 0:
+						op = Ops.Plus;
+						break;
+					case 1:
+						op = Ops.Minus;
+						break;
+					case 2:
+						op = Ops.Divide;
+						break;
+					case 3:
+						op = Ops.Times;
+						break;
+				}
+				if(op == Ops.Divide && value % 2 == 1)
+				{
+					op = Ops.Minus;
+				}
+				if(op == Ops.Plus || op == Ops.Minus)
+				{
+					int randValue = rand.Next(Math.Min(start / 2, end / 2), Math.Max(start * 2, start / 2));
+					Set(xy, new GridEle(op, Math.Abs(value - randValue)));
+					if(op == Ops.Plus)
+					{
+						value += Math.Abs(value - randValue);
+					}
+					else
+					{
+						value -= Math.Abs(value - randValue);
+					}
+				}
+				else if(op == Ops.Divide)
+				{ 
+					if(value > end*2)
+					{
+						Set(xy, new GridEle(op, 3));
+						value /= 4;
+					}
+					else
+					{
+						Set(xy, new GridEle(op, 2));
+						value /= 2;
+					}
+				}
+				else if(op == Ops.Times)
+				{
+					if(value > end*2)
+					{
+						Set(xy, new GridEle(op, 2));
+						value *= 2;
+					}
+					else
+					{
+						Set(xy, new GridEle(op, 3));
+						value *= 3;
+					}
+				}
+			}
+		}
+		GD.Print("value at end of path: ", value);
 	}
 
 	public List<XY> AdjacentTo(XY pos)
@@ -124,8 +238,18 @@ public class Grid
 		return grid[x][y];
 	}
 
+	public GridEle At(XY xy)
+	{
+		return grid[xy.x][xy.y];
+	}
+
 	public void Set(int x, int y, GridEle ele)
 	{
 		grid[x][y] = ele;
+	}
+
+	public void Set(XY xy, GridEle ele)
+	{
+		grid[xy.x][xy.y] = ele;
 	}
 }

@@ -20,8 +20,7 @@ public class GridSprite : TextureRect
     {
         
         Theme = Instance.gridTheme;
-        GD.Print("adding gridsprite");
-        ImageTexture squareImage = new ImageTexture();
+         ImageTexture squareImage = new ImageTexture();
         squareImage.CreateFromImage(Instance.square);
         this.Texture = squareImage;
         l = new Label();
@@ -32,7 +31,6 @@ public class GridSprite : TextureRect
 
         l.RectMinSize = new Vector2(width, height);
         AddChild(l);
-        GD.Print(l.RectGlobalPosition);
        
     }
 

@@ -31,7 +31,7 @@ public class Global : Node
 
 
     public enum Ops { 
-        None = ' ' , Plus = '+', Minus = '-', Times = '*', Divide = '/', Goal = ' '
+        None = ' ' , Plus = '+', Minus = '-', Times = '*', Divide = '/', Goal = 'G'
     };
 
     public override void _Ready()
