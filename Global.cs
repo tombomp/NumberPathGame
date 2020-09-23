@@ -22,7 +22,7 @@ public class Global : Node
 
     public static Global Instance { get { return instance; } }
 
-    public enum State { DrawStart, DrawEnd, DelStart, DelEnd}
+    public enum State { DrawStart, DrawEnd, DelStart, DelEnd, }
 
     Global()
     {
@@ -31,7 +31,7 @@ public class Global : Node
 
 
     public enum Ops { 
-        None = ' ' , Plus = '+', Minus = '-', Times = '*', Divide = '/'
+        None = ' ' , Plus = '+', Minus = '-', Times = '*', Divide = '/', Goal = ' '
     };
 
     public override void _Ready()

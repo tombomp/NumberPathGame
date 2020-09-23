@@ -22,17 +22,21 @@ public class GridScreen : Control
             for (int y = 0; y < Instance.maxY; y++)
             {
                 GD.Print(x, " ", y);
-				sprites[x][y] = new GridSprite
-				{
-					type = Ops.Divide,
-					number = 5
-				};
-				grid.AddChild(sprites[x][y]);
+                sprites[x][y] = new GridSprite
+                {
+                    type = Ops.Divide,
+                    number = 5
+                };
+                grid.AddChild(sprites[x][y]);
             }
         }
         Grid g = new Grid(5, 5);
-        Random rand = new Random(0);
-        System.Console.WriteLine(g.RandomPath(rand));
+        Random rand = new Random(1);
+        var path = g.RandomPath(rand);
+        foreach (var xy in path)
+        {
+            sprites[xy.x][xy.y].Modulate = Color.ColorN("red");
+        }
     }
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.

@@ -17,6 +17,16 @@ public class Grid
 		}
 	}
 
+	public struct XY
+	{
+		public readonly int x;
+		public readonly int y;
+		public XY(int _x, int _y)
+		{
+			x = _x;
+			y = _y;
+		}
+	}
 	GridEle[][] grid;
 
 	int maxX;
@@ -37,32 +47,34 @@ public class Grid
 		}
 	}
 
-	public List<Vector2> RandomPath(Random rand)
+
+
+	public List<XY> RandomPath(Random rand)
 	{
-		Stack<Vector2> result = new Stack<Vector2>();
-		result.Push(new Vector2(0, 0));
+		Stack<XY> result = new Stack<XY>();
+		result.Push(new XY(0, 0));
 		bool finished = false;
-		HashSet<Vector2> tried = new HashSet<Vector2>();
-		tried.Add(new Vector2(0, 0));
+		HashSet<XY> tried = new HashSet<XY>();
+		tried.Add(new XY(0, 0));
 		do
 		{
 			// reset and try again
 			// getting a "good" path is common enough that this is fine
 			if(result.Count == 0)
 			{
-				result = new Stack<Vector2>();
-				result.Push(new Vector2(0, 0));
-				tried = new HashSet<Vector2>();
-				tried.Add(new Vector2(0, 0));
+				result = new Stack<XY>();
+				result.Push(new XY(0, 0));
+				tried = new HashSet<XY>();
+				tried.Add(new XY(0, 0));
 			}
 			var adj = AdjacentTo(result.Peek());
-			if (adj.Contains(new Vector2(4,4))) {
+			if (adj.Contains(new XY(4,4))) {
 				GD.Print("Reached end");
-				result.Push(new Vector2(4, 4));
+				result.Push(new XY(4, 4));
 				finished = true;
 				break;
 			}
-			adj = adj.Except(tried).ToList<Vector2>();
+			adj = adj.Except(tried).ToList<XY>();
 			if(adj.Count == 0)
 			{
 				GD.Print("No adjs");
@@ -75,27 +87,34 @@ public class Grid
 			result.Push(toTry);
 		} while (!finished);
 
-		return result.ToList<Vector2>();
+		return result.ToList<XY>();
 	}
 
-	public List<Vector2> AdjacentTo(Vector2 pos)
+	public void FillPath(int start, int end, List<XY> path, Random rand)
 	{
-		List<Vector2> result = new List<Vector2>();
+		Set(0, 0, new GridEle(Global.Ops.Goal, start));
+		Set(maxX, maxY, new GridEle(Global.Ops.Goal, end));
+
+	}
+
+	public List<XY> AdjacentTo(XY pos)
+	{
+		List<XY> result = new List<XY>();
 		if(pos.x + 1 < maxX)
 		{
-			result.Add(new Vector2 { x = pos.x + 1, y = pos.y });
+			result.Add(new XY(pos.x + 1,pos.y));
 		}
 		if (pos.y + 1 < maxY)
 		{
-			result.Add(new Vector2 { x = pos.x, y = pos.y + 1 });
+			result.Add(new XY(pos.x, pos.y + 1));
 		}
 		if (pos.x - 1 >= 0)
 		{
-			result.Add(new Vector2 { x = pos.x - 1, y = pos.y });
+			result.Add(new XY(pos.x - 1, pos.y));
 		}
 		if (pos.y - 1 >= 0)
 		{
-			result.Add(new Vector2 { x = pos.x, y = pos.y - 1 });
+			result.Add(new XY(pos.x, pos.y - 1 ));
 		}
 		return result;
 	}
